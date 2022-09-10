@@ -12,20 +12,28 @@ const imagePaths = [
 
 const sprites = [];
 for(let i=0; i<imagePaths.length; i++) {
-	createImage(sprites, "myCanvas");
+	sprites.push([]);
+	for(let j=0; j<12; j++) {
+		createImage(sprites[i], "myCanvas");
+	}
 }
-
 
 let x = 10;
-let y = 100;
-for (let i=0; i<sprites.length; i++) {
-	sprites[i].onload = loadImage(sprites[i], x, y, 40, 40);
-	x += 50;
+let y = 150;
+for(let i=0; i<sprites.length; i++) {
+	for(let j=0; j<12; j++) {
+		sprites[i][j].onload = loadImage(sprites[i][j], x + 30 * j, y, 40, 40);
+	}
+	y -= 30;
 }
 
-for (let i=0; i<sprites.length; i++) {
-	sprites[i].src = imagePaths[i];
+for(let i=0; i<sprites.length; i++) {
+	for(let j=0; j<12; j++) {
+		sprites[i][j].src = imagePaths[i];
+	}
 }
+
+drawShip(10, 200);
 
 function createImage(sprites, canvas) {
 	image = new Image();
@@ -37,3 +45,16 @@ function loadImage(image, posX, posY, sizeX, sizeY) {
 	return () => {ctx.drawImage(image, posX, posY, sizeX, sizeY);}
 }
 
+function drawShip(posX, posY) {
+	ctx.beginPath();
+	ctx.moveTo(posX, posY);
+	ctx.lineTo(posX, posY + 10);
+	ctx.lineTo(posX + 25, posY + 10);
+	ctx.lineTo(posX + 25, posY);
+	ctx.lineTo(posX + 10, posY);
+	ctx.lineTo(posX + 10, posY - 5);
+	ctx.lineTo(posX + 15, posY - 5);
+	ctx.lineTo(posX + 15, posY);
+	ctx.lineTo(posX, posY);
+	ctx.fill();
+}
