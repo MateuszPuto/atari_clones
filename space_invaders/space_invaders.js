@@ -10,6 +10,14 @@ const imagePaths = [
 	"./assets/alien-3-pose-2.png"
 ];
 
+const alienSize = 40;
+let alienX = 10;
+let alienY = 150;
+
+let screenTicks = 50;
+let tick = 0;
+let rightDir = true;
+
 const sprites = [];
 for(let i=0; i<imagePaths.length; i++) {
 	sprites.push([]);
@@ -18,22 +26,21 @@ for(let i=0; i<imagePaths.length; i++) {
 	}
 }
 
-let x = 10;
-let y = 150;
-for(let i=0; i<sprites.length; i++) {
-	for(let j=0; j<12; j++) {
-		sprites[i][j].onload = loadImage(sprites[i][j], x + 30 * j, y, 40, 40);
-	}
-	y -= 30;
-}
-
 for(let i=0; i<sprites.length; i++) {
 	for(let j=0; j<12; j++) {
 		sprites[i][j].src = imagePaths[i];
 	}
 }
 
-drawShip(10, 200);
+let x = 10;
+let y = 150;
+for(let i=0; i<sprites.length; i++) {
+	for(let j=0; j<12; j++) {
+		sprites[i][j].onload = loadImage(sprites[i][j], x + 30 * j, y, alienSize, alienSize);
+	}
+	y -= 30;
+}
+
 
 function createImage(sprites, canvas) {
 	image = new Image();
@@ -43,6 +50,10 @@ function createImage(sprites, canvas) {
 
 function loadImage(image, posX, posY, sizeX, sizeY) {
 	return () => {ctx.drawImage(image, posX, posY, sizeX, sizeY);}
+}
+
+function clearScreen() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawShip(posX, posY) {
@@ -58,3 +69,44 @@ function drawShip(posX, posY) {
 	ctx.lineTo(posX, posY);
 	ctx.fill();
 }
+
+function drawAliens(x, y) {
+	for(let i=0; i<sprites.length; i++) {
+		for(let j=0; j<12; j++) {
+			loadImage(sprites[i][j], x + 30 * j, y, alienSize, alienSize)();
+		}
+	y -= 30;
+	}
+
+}
+
+function draw() {
+	clearScreen();
+	drawShip(10, 200);
+	drawAliens(alienX, alienY);
+	
+	if(rightDir) {
+		if(tick < screenTicks) {
+			alienX += 1;
+			tick += 1;
+		} else {
+			tick = 0;
+			rightDir = false;
+		}
+	} else {
+		if(tick < screenTicks) {
+			alienX -= 1;
+			tick += 1;
+		} else {
+			tick = 0;
+			rightDir = true;
+		}
+	}
+
+	console.log(alienX, tick, rightDir);
+}
+
+function main() {
+	setInterval(draw, 10);
+}
+main();
