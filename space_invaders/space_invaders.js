@@ -14,9 +14,15 @@ const alienSize = 40;
 let alienX = 10;
 let alienY = 150;
 
+let shipX = 10;
+let shipY = 200;
+let shipDx = 0;
+
 let screenTicks = 50;
 let tick = 0;
 let rightDir = true;
+
+let bullets = [];
 
 const sprites = [];
 for(let i=0; i<imagePaths.length; i++) {
@@ -41,6 +47,37 @@ for(let i=0; i<sprites.length; i++) {
 	y -= 30;
 }
 
+
+function keyDownHandler(e) {
+	switch(e.key) {
+		case "ArrowLeft":
+			shipDx = -1;
+			break;
+		case "ArrowRight":
+			shipDx = 1;
+			break;
+	}
+}
+
+function keyUpHandler(e) {
+	shipDx = 0;
+}
+
+function moveShip() {
+	shipX += 5 * shipDx;
+}
+
+function shipShoot() {
+	shoot(shipX, shipY, 0.1);
+}
+
+function shoot(posX, posY, speed) {
+	bullets.push({
+		"posX": posX,
+		"posY": posY,
+		"speed": speed,
+	});
+}
 
 function createImage(sprites, canvas) {
 	image = new Image();
@@ -80,11 +117,30 @@ function drawAliens(x, y) {
 
 }
 
+function drawBullets() {
+	let newBullets = [];
+
+	for(let i=0; i<bullets.length; i++) {
+		let bullet = bullets[i];
+
+		bullet["posY"] -= bullet["speed"];
+		ctx.strokeRect(bullet["posX"], bullet["posY"], 2, 5);
+	
+		if(bullet["posY"] < canvas.width && bullet["posY"] > 0) {
+			newBullets.push(bullet);
+		}
+	}
+
+	return newBullets;
+}
+
 function draw() {
 	clearScreen();
-	drawShip(10, 200);
+	moveShip();
+	drawShip(shipX, shipY);
 	drawAliens(alienX, alienY);
-	
+	bullets = drawBullets();
+
 	if(rightDir) {
 		if(tick < screenTicks) {
 			alienX += 1;
@@ -103,10 +159,18 @@ function draw() {
 		}
 	}
 
-	console.log(alienX, tick, rightDir);
 }
 
 function main() {
+	document.addEventListener("keydown", keyDownHandler, false);
+	document.addEventListener("keydown", (e) => {
+		if(e.code === "Space") {
+			console.log("space pushed");
+			shipShoot();
+		}
+	});
+	document.addEventListener("keyup", keyUpHandler, false);
+	
 	setInterval(draw, 10);
 }
 main();
