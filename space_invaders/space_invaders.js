@@ -19,12 +19,16 @@ const imagePaths2 = [
 	"./assets/alien-3.png"
 ];
 
+let score = 0;
+let highScore = 0;
+let lives = 3;
+
 const alienSize = 40;
 let alienX = 10;
-let alienY = 150;
+let alienY = 200;
 
 let shipX = 10;
-let shipY = 200;
+let shipY = 280;
 let shipDx = 0;
 
 let screenTicks = 50;
@@ -81,7 +85,7 @@ function moveShip() {
 }
 
 function shipShoot() {
-	shoot(shipX, shipY, 0.1);
+	shoot(shipX, shipY, 1);
 }
 
 function shoot(posX, posY, speed) {
@@ -147,8 +151,6 @@ function alienAnimation() {
 	}
 
 	animation = !animation;
-
-	//setTimeout(window.requestAnimationFrame(alienAnimation), 500);
 }
 
 function drawAliens(x, y) {
@@ -156,6 +158,7 @@ function drawAliens(x, y) {
 		for(let j=0; j<12; j++) {
 			if(drawable[i][j] && collisionDetection(x + 30*j, y)) {
 				drawable[i][j] = false;
+				score += (1 + Math.floor(i/2)) * 10;
 			}
 
 			if(drawable[i][j]) {
@@ -184,11 +187,25 @@ function drawBullets() {
 	return newBullets;
 }
 
+function drawScore() {
+	ctx.strokeText("SCORE<1> HI-SCORE SCORE<2>", 50, 20);
+	ctx.strokeText(score + "               " + highScore, 50, 40);
+}
+
+function drawLives() {
+	ctx.strokeText(lives, 50, 305);
+	for(let i=0; i<(lives-1); i++) {
+		drawShip(70 + 30 * i, 300);
+	}
+}
+
 function draw() {
 	clearScreen();
 	moveShip();
 	drawShip(shipX, shipY);
 	drawAliens(alienX, alienY);
+	drawScore();
+	drawLives();
 	bullets = drawBullets();
 
 	if(rightDir) {
