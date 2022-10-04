@@ -10,6 +10,15 @@ const imagePaths = [
 	"./assets/alien-3-pose-2.png"
 ];
 
+const imagePaths2 = [
+	"./assets/alien-1-pose-2.png",
+	"./assets/alien-1.png",
+	"./assets/alien-2-pose-2.png",
+	"./assets/alien-2.png",
+	"./assets/alien-3-pose-2.png",
+	"./assets/alien-3.png"
+];
+
 const alienSize = 40;
 let alienX = 10;
 let alienY = 150;
@@ -24,6 +33,7 @@ let rightDir = true;
 
 let bullets = [];
 
+let animation = true;
 let drawable = [];
 const sprites = [];
 for(let i=0; i<imagePaths.length; i++) {
@@ -89,7 +99,7 @@ function createImage(sprites, canvas) {
 }
 
 function loadImage(image, posX, posY, sizeX, sizeY) {
-	return () => {ctx.drawImage(image, posX, posY, sizeX, sizeY);}
+	return () => {ctx.drawImage(image, posX, posY, sizeX, sizeY)}
 }
 
 function clearScreen() {
@@ -123,6 +133,22 @@ function drawShip(posX, posY) {
 	ctx.lineTo(posX + 15, posY);
 	ctx.lineTo(posX, posY);
 	ctx.fill();
+}
+
+function alienAnimation() {
+	for(let i=0; i< sprites.length; i++) {
+		for(let j=0; j<12; j++) {
+			if(drawable[i][j] && animation) {
+				sprites[i][j].src = imagePaths2[i];
+			} else if(drawable[i][j]) {
+				sprites[i][j].src = imagePaths[i];
+			}
+		}
+	}
+
+	animation = !animation;
+
+	//setTimeout(window.requestAnimationFrame(alienAnimation), 500);
 }
 
 function drawAliens(x, y) {
@@ -183,7 +209,9 @@ function draw() {
 		}
 	}
 
+	setTimeout(window.requestAnimationFrame(draw), 10);
 }
+
 
 function main() {
 	document.addEventListener("keydown", keyDownHandler, false);
@@ -194,7 +222,8 @@ function main() {
 		}
 	});
 	document.addEventListener("keyup", keyUpHandler, false);
-	
-	setInterval(draw, 10);
+
+	setInterval(alienAnimation, 500);
+	window.requestAnimationFrame(draw);
 }
 main();
