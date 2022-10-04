@@ -24,11 +24,14 @@ let rightDir = true;
 
 let bullets = [];
 
+let drawable = [];
 const sprites = [];
 for(let i=0; i<imagePaths.length; i++) {
 	sprites.push([]);
+	drawable.push([]);
 	for(let j=0; j<12; j++) {
 		createImage(sprites[i], "myCanvas");
+		drawable[i].push(true);
 	}
 }
 
@@ -93,6 +96,21 @@ function clearScreen() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function collisionDetection(x, y) {
+	let collision = false;
+	for(let i=0; i<bullets.length; i++) {
+		bullet = bullets[i];
+		if(x >= bullet.posX - alienSize && x <= bullet.posX) {
+			if(y >= bullet.posY - alienSize/2 && y <= bullet.posY + alienSize/2) {
+				collision = true;
+				bullets.splice(i, 1);
+			}
+		}
+	}
+
+	return collision;
+}
+
 function drawShip(posX, posY) {
 	ctx.beginPath();
 	ctx.moveTo(posX, posY);
@@ -110,7 +128,13 @@ function drawShip(posX, posY) {
 function drawAliens(x, y) {
 	for(let i=0; i<sprites.length; i++) {
 		for(let j=0; j<12; j++) {
-			loadImage(sprites[i][j], x + 30 * j, y, alienSize, alienSize)();
+			if(drawable[i][j] && collisionDetection(x + 30*j, y)) {
+				drawable[i][j] = false;
+			}
+
+			if(drawable[i][j]) {
+				loadImage(sprites[i][j], x + 30 * j, y, alienSize, alienSize)();
+			}
 		}
 	y -= 30;
 	}
