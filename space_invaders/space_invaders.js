@@ -28,7 +28,7 @@ let alienX = 10;
 let alienY = 200;
 
 let shipX = 10;
-let shipY = 280;
+let shipY = 400;
 let shipDx = 0;
 
 let screenTicks = 50;
@@ -36,6 +36,7 @@ let tick = 0;
 let rightDir = true;
 
 let bullets = [];
+let projectiles = [];
 
 let animation = true;
 let drawable = [];
@@ -96,6 +97,14 @@ function shoot(posX, posY, speed) {
 	});
 }
 
+function alienShoot(posX, posY, speed) {
+	projectiles.push({
+		"posX": posX,
+		"posY": posY,
+		"speed": speed,
+	});
+}
+
 function createImage(sprites, canvas) {
 	image = new Image();
 	document.getElementById(canvas).appendChild(image);
@@ -113,7 +122,7 @@ function clearScreen() {
 function collisionDetection(x, y) {
 	let collision = false;
 	for(let i=0; i<bullets.length; i++) {
-		bullet = bullets[i];
+		let bullet = bullets[i];
 		if(x >= bullet.posX - alienSize && x <= bullet.posX) {
 			if(y >= bullet.posY - alienSize/2 && y <= bullet.posY + alienSize/2) {
 				collision = true;
@@ -123,6 +132,19 @@ function collisionDetection(x, y) {
 	}
 
 	return collision;
+}
+
+function shipCollision() {
+	for(let i=0; i<projectiles.length; i++) {
+		let projectile = projectiles[i];
+
+		if(projectile.posX > shipX && projectile.posX < shipX + 25) {
+			if(projectile.posY > shipY && projectile.posY < shipY + 10){
+				lives -= 1;
+				projectiles.splice(i, 1);
+			}
+		}
+	}
 }
 
 function drawShip(posX, posY) {
@@ -153,6 +175,14 @@ function alienAnimation() {
 	animation = !animation;
 }
 
+function aliensAttack(posX, posY) {
+	let shootingChance = Math.random();
+
+	if(posX > shipX - 10 && posX < shipX + 10 && shootingChance < 0.002) {
+		alienShoot(posX, posY, 1);
+	}
+}
+
 function drawAliens(x, y) {
 	for(let i=0; i<sprites.length; i++) {
 		for(let j=0; j<12; j++) {
@@ -163,6 +193,8 @@ function drawAliens(x, y) {
 
 			if(drawable[i][j]) {
 				loadImage(sprites[i][j], x + 30 * j, y, alienSize, alienSize)();
+		
+				aliensAttack(x + 30 * j, y);
 			}
 		}
 	y -= 30;
@@ -187,15 +219,32 @@ function drawBullets() {
 	return newBullets;
 }
 
+function drawProjectiles() {
+	let newProjectiles = [];
+
+	for(let i=0; i<projectiles.length; i++) {
+		let projectile = projectiles[i];
+
+		projectile["posY"] += projectile["speed"];
+		ctx.strokeRect(projectile["posX"], projectile["posY"], 4, 5);
+
+		if(projectile["posY"] < canvas.width && projectile["posY"] > 0) {
+			newProjectiles.push(projectile);
+		}
+	}
+
+	return newProjectiles;
+}
+
 function drawScore() {
 	ctx.strokeText("SCORE<1> HI-SCORE SCORE<2>", 50, 20);
 	ctx.strokeText(score + "               " + highScore, 50, 40);
 }
 
 function drawLives() {
-	ctx.strokeText(lives, 50, 305);
+	ctx.strokeText(lives, 50, 445);
 	for(let i=0; i<(lives-1); i++) {
-		drawShip(70 + 30 * i, 300);
+		drawShip(70 + 30 * i, 440);
 	}
 }
 
@@ -203,10 +252,12 @@ function draw() {
 	clearScreen();
 	moveShip();
 	drawShip(shipX, shipY);
+	shipCollision();
 	drawAliens(alienX, alienY);
 	drawScore();
 	drawLives();
 	bullets = drawBullets();
+	projectiles = drawProjectiles();
 
 	if(rightDir) {
 		if(tick < screenTicks) {
