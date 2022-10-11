@@ -31,7 +31,7 @@ let shipX = 10;
 let shipY = 400;
 let shipDx = 0;
 
-let screenTicks = 50;
+let screenTicks = 100;
 let tick = 0;
 let rightDir = true;
 
@@ -265,6 +265,7 @@ function draw() {
 			tick += 1;
 		} else {
 			tick = 0;
+			alienY += 5;
 			rightDir = false;
 		}
 	} else {
@@ -273,24 +274,32 @@ function draw() {
 			tick += 1;
 		} else {
 			tick = 0;
+			alienY += 5;
 			rightDir = true;
 		}
 	}
 
-	setTimeout(window.requestAnimationFrame(draw), 10);
+	setTimeout(window.requestAnimationFrame(draw), 20);
 }
 
 
 function main() {
 	document.addEventListener("keydown", keyDownHandler, false);
-	document.addEventListener("keydown", (e) => {
+	document.addEventListener("keyup", keyUpHandler, false);
+
+	const spacebarHandler = (e) => {
 		if(e.code === "Space") {
 			console.log("space pushed");
 			shipShoot();
+			document.removeEventListener("keydown", spacebarHandler);
 		}
-	});
-	document.addEventListener("keyup", keyUpHandler, false);
+	}
 
+	const addShooting = () => {
+		document.addEventListener("keydown", spacebarHandler);
+	}
+
+	setInterval(addShooting, 500);
 	setInterval(alienAnimation, 500);
 	window.requestAnimationFrame(draw);
 }
