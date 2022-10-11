@@ -86,7 +86,7 @@ function moveShip() {
 }
 
 function shipShoot() {
-	shoot(shipX, shipY, 1);
+	shoot(shipX+12.5, shipY, 1);
 }
 
 function shoot(posX, posY, speed) {
@@ -209,7 +209,7 @@ function drawBullets() {
 		let bullet = bullets[i];
 
 		bullet["posY"] -= bullet["speed"];
-		ctx.strokeRect(bullet["posX"], bullet["posY"], 2, 5);
+		ctx.fillRect(bullet["posX"], bullet["posY"], 3, 6);
 	
 		if(bullet["posY"] < canvas.width && bullet["posY"] > 0) {
 			newBullets.push(bullet);
@@ -248,7 +248,29 @@ function drawLives() {
 	}
 }
 
+function checkGameEnd() {
+	let won = true;
+	for(let i=0; i<drawable.length; i++) {
+		for(let j=0; j<drawable[i].length; j++) {
+			if(drawable[i][j] == true) {
+				won = false;
+				break;
+			}
+		}
+	}
+
+	if(won) {
+		alert("You have won the game!");
+		document.location.reload();
+	} else if(lives == 0 || alienY > canvas.height) {
+		alert("You have lost to aliens!");
+		document.location.reload();
+	}
+}
+
 function draw() {
+	checkGameEnd();
+
 	clearScreen();
 	moveShip();
 	drawShip(shipX, shipY);
